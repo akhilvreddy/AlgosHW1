@@ -1,0 +1,54 @@
+'''
+Problem 1b
+
+input: File containing an integer n followed by 2n lines containing the preferences of the n students and then the n hospitals (see README).
+output: Dictionary mapping students to hospitals. 
+
+TODO: Fix the bug and run performance experiments.
+'''
+def stable_matching_1b(file) -> dict:
+    n = 0
+    doctors_pref = []
+    hospitals_pref = []
+
+    with open(file, "r") as f:
+        n = int(f.readline())
+        for _ in range(n):
+            d_pref = f.readline().split()
+            doctors_pref.append([int(x) for x in d_pref])
+
+        for _ in range(n):
+            h_pref = f.readline().split()
+            hospitals_pref.append([int(x) for x in h_pref])
+    
+    # doctors to hospitals map
+    pairs = {} 
+    matched_hospitals = set()
+
+    # continues until all hospitals are matched 
+    # For each hospital, it finds doctor they prefer and checks doctor's preference
+    # Does this for n hospitals, iterates over n doctors, and then conducts pop and index functions which take O(n) so O(n^3)
+    while len(matched_hospitals) < n:
+        for h in range(n):
+            if h not in matched_hospitals:
+
+                # # operation below takes O(n) time 
+                doc_preference = hospitals_pref[h].pop(0)
+
+                # If the hospital's preference hasn't been matched
+                if doc_preference not in pairs:
+                    pairs[doc_preference] = h
+                    matched_hospitals.add(h)
+
+                # If the hospital's preference already has a match
+                else:
+                    h2 = pairs[doc_preference]
+                    h1_idx = doctors_pref[doc_preference].index(h)
+                    h2_idx = doctors_pref[doc_preference].index(h2)
+                    ##^These lines use index function, which has time complexity of O(n)
+                    if h1_idx < h2_idx:
+                        pairs[doc_preference] = h
+                        matched_hospitals.add(h)
+                        matched_hospitals.remove(h2)
+
+    return pairs
